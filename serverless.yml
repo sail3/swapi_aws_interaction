@@ -1,0 +1,87 @@
+org: sail3
+app: sail3-swapi-aws
+service: sail3-swapi-aws
+frameworkVersion: '3'
+
+plugins:
+  - serverless-offline
+  - serverless-dotenv-plugin
+  - serverless-esbuild
+  - serverless-openapi-documentation
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-2
+  environment:
+    REGION: us-east-2
+    SPECIES_TABLE: dyn-species-swapi-din
+    PLANET_TABLE: dyn-planet-swapi-din
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.SPECIES_TABLE}
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PLANET_TABLE}
+
+custom:
+  documentation:
+    title: Swapi - AWS interaction | Pedro Charun
+    description: Api to gets planets and species from swapi.
+    contact:
+      email: mlosail3@gmail.com
+    version: 1.0.0
+
+functions:
+  addSpecies:
+    handler: ./src/functions/add-species/handler.addSpecies
+    events:
+      - httpApi:
+          path: /species
+          method: post
+  listSpecies:
+    handler: ./src/functions/list-species/handler.listSpecies
+    events:
+      - httpApi:
+          path: /species/{id}
+          method: get
+  addPlanet:
+    handler: ./src/functions/add-planet/handler.addPlanet
+    events:
+      - httpApi:
+          path: /planet
+          method: post
+  listPlanet:
+    handler: ./src/functions/list-planet/handler.listPlanet
+    events:
+      - httpApi:
+          path: /planet/{id}
+          method: get
+
+resources:
+  Resources:
+    DNYPlanetSwapi:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: dyn-planet-swapi
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: N
+        KeySchema:
+          - AttributeName: id
+            KeyType: hash 
+    DNYSpeciesSwapi:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: dyn-species-swapi
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: N
+        KeySchema:
+          - AttributeName: id
+            KeyType: hash             
