@@ -1,5 +1,3 @@
-org: sail3
-app: sail3-swapi-aws
 service: sail3-swapi-aws
 frameworkVersion: '3'
 
@@ -12,11 +10,11 @@ plugins:
 provider:
   name: aws
   runtime: nodejs18.x
-  region: us-east-2
+  region: us-east-1
   environment:
-    REGION: us-east-2
-    SPECIES_TABLE: dyn-species-swapi-din
-    PLANET_TABLE: dyn-planet-swapi-din
+    REGION: us-east-1
+    SPECIES_TABLE: dyn-species-swapi
+    PLANET_TABLE: dyn-planet-swapi
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -73,7 +71,7 @@ resources:
             AttributeType: N
         KeySchema:
           - AttributeName: id
-            KeyType: hash 
+            KeyType: "HASH"
     DNYSpeciesSwapi:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -84,4 +82,4 @@ resources:
             AttributeType: N
         KeySchema:
           - AttributeName: id
-            KeyType: hash             
+            KeyType: "HASH"
